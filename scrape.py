@@ -19,25 +19,15 @@ def get_zzounds_products(path):
 
         regex = r'\S+'
         filtered_price = re.search(regex, price).group(0)
-        products.append([text, href, img_url, filtered_price])
-        #print("Item: " + text + "\nLink: " + href + "\nImage URL: " + img_url + "\nPrice: " + filtered_price + "\n\n\n")
-
+        curr_product = {"name": text, "url": href, "image_url": img_url, "price": filtered_price}
+        products.append(curr_product)
+        print(curr_product)
+        try:
+            result = requests.post("http://127.0.0.1:5000/products", json=curr_product)
+        except requests.exceptions.RequestException as e:
+            raise SystemExit(e)
     return products
 
-
-    """
-    links = soup.find_all("a", class_="prod-name")
-    products = []
-
-    for link in links:
-        if link.text:
-            products.append([link.text, link['href']])
-        
-    
-    return products
-    """
-
-print(get_zzounds_products("https://www.zzounds.com/prodsearch?cat=2463&condition%5B0%5D=New&ob=az&pa=33&form=search&key=cat&p=2"))
 
 def get_multipage_zzounds_products(category="2463"):
     url = "https://www.zzounds.com/prodsearch?cat=" + category + "&condition%5B0%5D=New&ob=az&pa=33&form=search&key=cat"
@@ -57,12 +47,8 @@ def get_multipage_zzounds_products(category="2463"):
             url = "https://www.zzounds.com/prodsearch?cat=" + category + "&condition%5B0%5D=New&ob=az&pa=33&form=search&key=cat" + "&p=" + str(i + 1)
         
         products += get_zzounds_products(url)
-    return products
-"""
-all_products = get_multipage_zzounds_products()
-file_object = open("test.txt", "w+")
-file_object.write(str(all_products))
-for product in all_products:
-    print(product)
-"""
+
+    return True
+
+products = get_multipage_zzounds_products()
 
