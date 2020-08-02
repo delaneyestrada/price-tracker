@@ -33,7 +33,13 @@ def get_product(id):
 @app.route('/products/instrument/<id>', methods=['GET'])
 def get_group(id):
     group = Product.objects(instrument=id).to_json()
-    return Response(group, mimetype="application/json", status=200) 
+    return Response(group, mimetype="application/json", status=200)
+
+@app.route('/products/search', methods=['GET'])
+def get_products_from_query():
+    query = request.args.get('q')
+    product = Product.objects(name__icontains=query).to_json()
+    return Response(product, mimetype="application/json", status=200)
 
 @app.route('/products', methods=['POST'])
 def add_product():
