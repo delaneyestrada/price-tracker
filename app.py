@@ -1,14 +1,24 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, render_template
+from flask_cors import CORS
 from database.db import initialize_db
 from database.models import Product
+from mongoengine.errors import NotUniqueError
+import requests
 
 app = Flask(__name__)
+CORS(app)
 
 app.config['MONGODB_SETTINGS'] = {
+    'db': 'price-tracker',
     'host': 'mongodb://localhost/price-tracker'
+
 }
 
 initialize_db(app)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/products')
 def get_products():
@@ -20,11 +30,21 @@ def get_product(id):
     product = Product.objects.get(id=id).to_json()
     return Response(product, mimetype="application/json", status=200)
 
+@app.route('/products/instrument/<id>', methods=['GET'])
+def get_group(id):
+    group = Product.objects(instrument=id).to_json()
+    return Response(group, mimetype="application/json", status=200) 
+
 @app.route('/products', methods=['POST'])
 def add_product():
     body = request.get_json()
-    product = Product(**body).save()
-    id = movie.id
+    print(body)
+    try:
+        product = Product(**body).save()
+    except NotUniqueError as e:
+        raise Exception(e)
+    
+    id = product.id
     return {'id': str(id)}, 200
 
 @app.route('/products/<id>', methods=['PUT'])
@@ -38,4 +58,4 @@ def delete_product(id):
     Product.objects.get(id=id).delete()
     return '', 200
 
-app.run()
+app.run(debug=True)
