@@ -1,24 +1,18 @@
+from app import app
 from flask import Flask, request, Response, render_template
-from flask_cors import CORS
-from database.db import initialize_db
 from database.models import Product
-from mongoengine.errors import NotUniqueError
-import requests
-
-app = Flask(__name__)
-CORS(app)
-
-app.config['MONGODB_SETTINGS'] = {
-    'db': 'price-tracker',
-    'host': 'mongodb://localhost/price-tracker'
-
-}
-
-initialize_db(app)
+from mongoengine.queryset.visitor import Q
+from app.forms import LoginForm
 
 @app.route('/')
+@app.route('/index')
 def index():
     return render_template('index.html')
+
+@app.route('/login')
+def login():
+    form = LoginForm()
+    return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/products')
 def get_products():
@@ -28,6 +22,7 @@ def get_products():
 @app.route('/products/<id>', methods=['GET'])
 def get_product(id):
     product = Product.objects.get(id=id).to_json()
+    print(product)
     return Response(product, mimetype="application/json", status=200)
 
 @app.route('/products/instrument/<id>', methods=['GET'])
@@ -35,10 +30,22 @@ def get_group(id):
     group = Product.objects(instrument=id).to_json()
     return Response(group, mimetype="application/json", status=200)
 
+@app.route('/products/instrument/<id>/search', methods=['GET'])
+def get_group_from_query(id):
+    query = request.args.get('q')
+    product = Product.objects(Q(name__icontains=query) & Q(instrument=id)).to_json()
+    return Response(product, mimetype="application/json", status=200)
+
 @app.route('/products/search', methods=['GET'])
 def get_products_from_query():
     query = request.args.get('q')
     product = Product.objects(name__icontains=query).to_json()
+    return Response(product, mimetype="application/json", status=200)
+
+@app.route('/product/search', methods=['GET'])
+def get_product_from_id():
+    query = request.args.get('q')
+    product = Product.objects(id=query).to_json()
     return Response(product, mimetype="application/json", status=200)
 
 @app.route('/products', methods=['POST'])
@@ -63,5 +70,3 @@ def update_product(id):
 def delete_product(id):
     Product.objects.get(id=id).delete()
     return '', 200
-
-app.run(debug=True)
