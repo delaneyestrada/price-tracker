@@ -1,20 +1,12 @@
-from flask import Flask, request, Response, render_template
+from flask import Flask
 from flask_cors import CORS
 from database.db import initialize_db
-from database.models import Product
-from mongoengine.errors import NotUniqueError
-from mongoengine.queryset.visitor import Q
-from werkzeug.urls import url_parse
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import current_user, login_user, logout_user, login_required
-import requests
-import os
+from flask_login import LoginManager
 from config import Config
 
 app = Flask(__name__)
 CORS(app)
-
-
+login = LoginManager(app)
 
 app.config.from_object(Config)
 app.config['MONGODB_SETTINGS'] = {
