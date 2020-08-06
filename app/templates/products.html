@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+{% if current_user.is_anonymous %}
+<div class="row justify-content-center">
+  <div class="col-8">
+    <h1>Sign in to use the rig builder.</h1>
+  </div>
+</div>
+{% else %}
+<div class="row">
+  <div id="search-filters" class="col-2 p-0">
+    <div class="input-group col-12 justify-content-center mt-3 mb-3">
+      <input type="text" id="product-search" placeholder="Search for a product" class="form-control typeahead"
+        aria-label="Text input with dropdown button">
+    </div>
+    <div class="row justify-content-start">
+      <div class="col-12 ">
+        <div id="category-buttons">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios1" value="all" checked>
+            <label class="form-check-label" for="categoryRadios1">
+              All
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios2" value="guitar">
+            <label class="form-check-label" for="categoryRadios2">
+              Guitar
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios3" value="drum">
+            <label class="form-check-label" for="categoryRadios3">
+              Drums
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios4" value="bass">
+            <label class="form-check-label" for="categoryRadios4">
+              Bass
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios5"
+              value="keyboard_and_midi">
+            <label class="form-check-label" for="categoryRadios5">
+              Keyboard & Midi
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios6" value="recording">
+            <label class="form-check-label" for="categoryRadios6">
+              Recording
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios7" value="live_sound">
+            <label class="form-check-label" for="categoryRadios7">
+              Live Sound
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios8" value="dj">
+            <label class="form-check-label" for="categoryRadios8">
+              DJ
+            </label>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+  <div class="col-8 pt-1 pl-5">
+    <ul class="list-group mt-1" id="wishlist">
+      <h2>
+        Your Rig
+      </h2>
+      <div class="f-search__suggestion"></div>
+    </ul>
+    <nav aria-label="...">
+      <ul class="pagination">
+        <li class="page-item active"><a class="page-link" href="?page=1">1</a></li>
+        <li class="page-item" aria-current="page"><a class="page-link" href="?page=2">2</a></li>
+        <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
+      </ul>
+    </nav>
+
+  </div>
+</div>
+</div>
+
+{% endif %}
+</div>
+
+{% endblock %}

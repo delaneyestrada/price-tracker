@@ -1,6 +1,6 @@
 from app import app
 from flask import Flask, request, Response, render_template, flash, redirect, url_for
-from database.models import Product, User
+from database.models import Product, User, RigList
 from mongoengine.queryset.visitor import Q
 from app.forms import LoginForm, RegistrationForm
 from mongoengine.errors import NotUniqueError
@@ -65,7 +65,7 @@ def logout():
 @app.route('/products')
 def get_products():
     products = Product.objects().to_json()
-    return Response(products, mimetype="application/json", status=200)
+    return Response(products, mimetype="application/json", status=200), render_template('products.html')
 
 @app.route('/products/<id>', methods=['GET'])
 def get_product(id):
@@ -77,17 +77,31 @@ def get_product(id):
 def get_group(id):
     group = Product.objects(instrument=id).to_json()
     return Response(group, mimetype="application/json", status=200)
-
+"""
 @app.route('/products/instrument/<id>/search', methods=['GET'])
 def get_group_from_query(id):
     query = request.args.get('q')
     product = Product.objects(Q(name__icontains=query) & Q(instrument=id)).to_json()
     return Response(product, mimetype="application/json", status=200)
+"""
 
 @app.route('/products/search', methods=['GET'])
 def get_products_from_query():
+    number_per_page = 20
+    page = int(request.args.get('page'))
+    index = number_per_page * page
+    previous_index = index - number_per_page
+
     query = request.args.get('q')
-    product = Product.objects(name__icontains=query).to_json()
+    categories = request.args.get('categories')
+
+    if categories == "all":
+        print(categories)
+        product = Product.objects(name__icontains=query)[previous_index:index].to_json()
+    else:
+        product = Product.objects(Q(name__icontains=query) & Q(instrument=categories))[previous_index:index].to_json()
+    
+    
     return Response(product, mimetype="application/json", status=200)
 
 @app.route('/product/search', methods=['GET'])

@@ -5,3 +5,4 @@ node_modules
 bower_components/
 static/js/typeahead.jquery.min.js
 __pycache__
+app/static/img
