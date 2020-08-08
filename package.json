@@ -4,7 +4,6 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
-    "bloodhound-js": "^1.2.3"
   },
   "devDependencies": {},
   "scripts": {

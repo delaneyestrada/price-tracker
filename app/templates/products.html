@@ -8,7 +8,68 @@
 </div>
 {% else %}
 <div class="row">
-  <div id="search-filters" class="col-2 p-0">
+    <div id="search-filters" class="col-2 p-0">
+    <form id="filter-form">
+        <div class="form-group">
+            <div class="input-group col-12 justify-content-center mt-3 mb-3">
+                <input type="text" name="q" id="product-search" placeholder="Search for a product" class="form-control typeahead"
+                  aria-label="Text input with dropdown button">
+              </div>
+        </div>
+        <div id="category-buttons" class="form-group pl-3">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="categories" id="all" value="all" checked>
+              <label class="form-check-label" for="all">
+                All
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="categories" id="guitar" value="guitar">
+              <label class="form-check-label" for="guitar">
+                Guitar
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="categories" id="drum" value="drum">
+              <label class="form-check-label" for="drum">
+                Drums
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="categories" id="bass" value="bass">
+              <label class="form-check-label" for="bass">
+                Bass
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="categories" id="keyboard_and_midi"
+                value="keyboard_and_midi">
+              <label class="form-check-label" for="keyboard_and_midi">
+                Keyboard & Midi
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="categories" id="recording" value="recording">
+              <label class="form-check-label" for="recording">
+                Recording
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="categories" id="live_sound" value="live_sound">
+              <label class="form-check-label" for="live_sound">
+                Live Sound
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="categories" id="dj" value="dj">
+              <label class="form-check-label" for="dj">
+                DJ
+              </label>
+            </div>
+          </div>
+        <button type="submit" name="page" value="{{ page_info.page }}" class="btn btn-primary ml-3">Submit</button>
+      </form>
+  <!--<div id="search-filters" class="col-2 p-0">
     <div class="input-group col-12 justify-content-center mt-3 mb-3">
       <input type="text" id="product-search" placeholder="Search for a product" class="form-control typeahead"
         aria-label="Text input with dropdown button">
@@ -65,25 +126,63 @@
               DJ
             </label>
           </div>
-        </div>
+        </div> -->
       </div>
 
 
-    </div>
-  </div>
 
   <div class="col-8 pt-1 pl-5">
     <ul class="list-group mt-1" id="wishlist">
       <h2>
         Your Rig
       </h2>
-      <div class="f-search__suggestion"></div>
+      <h6>Search through {{ page_info.num_products }} products</h6>
+      <div class="results-table">
+
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Link</th>
+                </tr>
+            </thead>
+            <tbody id="table-data"></tbody>
+        </table>
+
+      </div>
     </ul>
+    {% if page_info %}
     <nav aria-label="...">
       <ul class="pagination">
-        <li class="page-item active"><a class="page-link" href="?page=1">1</a></li>
-        <li class="page-item" aria-current="page"><a class="page-link" href="?page=2">2</a></li>
-        <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
+        
+        {% if page_info.page == 1 %}
+        <li class="page-item disabled"><button class="page-link btn btn-primary disabled" type="submit" form="filter-form" name="page" value="1" tabindex="-1" aria-disabled="true"><<</li>
+        <li class="page-item disabled"><button class="page-link btn btn-primary disabled" type="submit" form="filter-form" name="page" value="{{ page_info.page - 1 }}" tabindex="-1" aria-disabled="true"><</li>
+        <li class="page-item active"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page }}">{{ page_info.page }}</li>
+        <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page + 1 }}">{{ page_info.page + 1 }}</li>
+        <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page + 2 }}">{{ page_info.page + 2 }}</li>
+        <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page + 1 }}" tabindex="-1" aria-disabled="true">></li>
+        <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.number_of_pages }}" tabindex="-1" aria-disabled="true">>></li>
+        {% elif page_info.page == page_info.number_of_pages %}
+        <li class="page-item"><button class="page-link btn btn-primary " type="submit" form="filter-form" name="page" value="1" tabindex="-1" aria-disabled="true"><<</li>
+        <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page - 1 }}" tabindex="-1" aria-disabled="true"><</li>
+        <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page - 2}}">{{ page_info.page - 2}}</li>
+        <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page - 1 }}">{{ page_info.page - 1}}</li>
+        <li class="page-item active"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page }}">{{ page_info.page}}</li>
+        <li class="page-item disabled"><button class="page-link btn btn-primary disabled" type="submit" form="filter-form" name="page" value="{{ page_info.page + 1 }}" tabindex="-1" aria-disabled="true">></li>
+        <li class="page-item disabled"><button class="page-link btn btn-primary disabled" type="submit" form="filter-form" name="page" value="{{ page_info.number_of_pages }}" tabindex="-1" aria-disabled="true">>></li>
+        {% else %}
+        <li class="page-item"><button class="page-link btn btn-primary " type="submit" form="filter-form" name="page" value="1" tabindex="-1" aria-disabled="true"><<</li>
+            <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page - 1 }}" tabindex="-1" aria-disabled="true"><</li>
+            <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page - 1}}">{{ page_info.page - 1 }}</li>
+            <li class="page-item active"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page }}">{{ page_info.page }}</li>
+            <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page + 1}}">{{ page_info.page + 1 }}</li>
+            <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.page + 1 }}" tabindex="-1" aria-disabled="true">></li>
+            <li class="page-item"><button class="page-link btn btn-primary" type="submit" form="filter-form" name="page" value="{{ page_info.number_of_pages }}" tabindex="-1" aria-disabled="true">>></li>
+
+        {% endif %}
+    {% endif %}
       </ul>
     </nav>
 
