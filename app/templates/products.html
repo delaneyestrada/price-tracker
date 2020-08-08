@@ -10,12 +10,7 @@
 <div class="row">
     <div id="search-filters" class="col-2 p-0">
     <form id="filter-form">
-        <div class="form-group">
-            <div class="input-group col-12 justify-content-center mt-3 mb-3">
-                <input type="text" name="q" id="product-search" placeholder="Search for a product" class="form-control typeahead"
-                  aria-label="Text input with dropdown button">
-              </div>
-        </div>
+        
         <div id="category-buttons" class="form-group pl-3">
             <div class="form-check">
               <input class="form-check-input" type="radio" name="categories" id="all" value="all" checked>
@@ -69,75 +64,40 @@
           </div>
         <button type="submit" name="page" value="{{ page_info.page }}" class="btn btn-primary ml-3">Submit</button>
       </form>
-  <!--<div id="search-filters" class="col-2 p-0">
-    <div class="input-group col-12 justify-content-center mt-3 mb-3">
-      <input type="text" id="product-search" placeholder="Search for a product" class="form-control typeahead"
-        aria-label="Text input with dropdown button">
-    </div>
-    <div class="row justify-content-start">
-      <div class="col-12 ">
-        <div id="category-buttons">
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios1" value="all" checked>
-            <label class="form-check-label" for="categoryRadios1">
-              All
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios2" value="guitar">
-            <label class="form-check-label" for="categoryRadios2">
-              Guitar
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios3" value="drum">
-            <label class="form-check-label" for="categoryRadios3">
-              Drums
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios4" value="bass">
-            <label class="form-check-label" for="categoryRadios4">
-              Bass
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios5"
-              value="keyboard_and_midi">
-            <label class="form-check-label" for="categoryRadios5">
-              Keyboard & Midi
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios6" value="recording">
-            <label class="form-check-label" for="categoryRadios6">
-              Recording
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios7" value="live_sound">
-            <label class="form-check-label" for="categoryRadios7">
-              Live Sound
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="categoryRadios" id="categoryRadios8" value="dj">
-            <label class="form-check-label" for="categoryRadios8">
-              DJ
-            </label>
-          </div>
-        </div> -->
       </div>
 
 
 
-  <div class="col-8 pt-1 pl-5">
-    <ul class="list-group mt-1" id="wishlist">
+  <div class="col-10 pt-1 pl-5">
+      <div class="mt-1 mb-5" id="riglist-container">
+    <ul class="list-group" id="riglist">
+        <h2>Your Rig</h2>
+    </ul>
+    <span class="riglist-text">Add items to your rig from below.</span>
+    <div class="save-group d-flex justify-content-end">
+        <span class="riglist-text">Save your list</span>
+        <form id="riglist-form" action="/rigs" method="POST">
+        <div class="form-group">
+        <input class="form-control" name="name" type="text" placeholder="Rig name">
+        <button type="submit" name="username" value="{{ current_user.username }}" class="btn btn-primary">Save</button>
+        </div>
+        </form>
+    </div>
+</div>
+    <ul class="list-group mt-1" id="search">
       <h2>
-        Your Rig
+        Gear Search
       </h2>
-      <h6>Search through {{ page_info.num_products }} products</h6>
-      <div class="results-table">
+      <div class="form-group">
+        <label for="product-search">
+            Filter {{ page_info.num_products }} products
+          </label>
+        <div class="input-group col-12 justify-content-center mb-3">
+            <input type="text" form="filter-form" name="q" id="product-search" placeholder="Search for a product" class="form-control typeahead"
+              aria-label="Text input with dropdown button">
+          </div>
+    </div>
+      <div id="results-table" class="results-table">
 
         <table class="table">
             <thead class="thead-dark">

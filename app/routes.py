@@ -17,6 +17,8 @@ def index():
 
 @app.route('/products')
 def products():
+    print("\nCurrent user:\n" + str(current_user) + "\n")
+    print("Current session:\n" + str(session) + "\n")
     """
     page_info = {
             'query': request.args.get('q'),
@@ -34,7 +36,6 @@ def products():
     try:
         session['page_info']['page'] = int(request.args.get('page'))
         page_info = session['page_info']
-        print(page_info)
         return render_template('products.html', page_info=page_info)
     except (AttributeError, TypeError) as e:
         print("Error")
@@ -83,7 +84,30 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
+    session['page_info'] = {}
     return redirect(url_for('index'))
+# RIGLIST API
+@app.route('/rigs', methods=['GET', 'POST'])
+def rigs():
+    if request.method == 'GET':
+        username = current_user.username
+        user = User.objects(username=username)[0]
+        rigs = RigList.objects(user=user)
+        return render_template('rigs.html', rigs=rigs, user=user)
+    if request.method == 'POST':
+        print(request.form)
+        user = User.objects(username=request.form.get('username'))[0]
+        body = {'name': request.form.get('name'), 'products': [], 'user': user }
+        for product_id in request.form.getlist('product_id'):
+            body['products'].append(Product.objects.get(id=product_id))
+        print(body)
+        try:
+            riglist = RigList(**body).save()
+        except NotUniqueError as e:
+            raise Exception(e)
+    
+        id = riglist.id
+        return {'id': str(id)}, 200
 
 # PRODUCT API
 @app.route('/products/<id>', methods=['GET'])
@@ -100,7 +124,10 @@ def get_group(id):
 @app.route('/products/search', methods=['GET'])
 def get_products_from_query():
     number_per_page = 20
-    page = int(request.args.get('page'))
+    try:
+        page = int(request.args.get('page'))
+    except ValueError:
+        page = 1
     index = number_per_page * page
     previous_index = index - number_per_page
 
@@ -108,7 +135,7 @@ def get_products_from_query():
     categories = request.args.get('categories')
     req = request.args.get('req')
     if req == "products":
-        if categories == "all":
+        if categories == "all" or categories == "undefined":
             product = (Product.objects(name__icontains=query)[previous_index:index].to_json())
             session['num_products'] = len(Product.objects(name__icontains=query))
         else:

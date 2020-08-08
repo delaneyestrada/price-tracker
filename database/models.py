@@ -13,13 +13,14 @@ class Product(db.Document):
 
 class RigList(db.Document):
     name = db.StringField(required=True)
-    products = db.ListField(db.ReferenceField(Product))
+    products = db.ListField(db.ReferenceField('Product'))
+    user = db.ReferenceField('User')
 
 class User(UserMixin, db.Document):
     username = db.StringField(required=True, unique=True)
     email = db.EmailField(required=True, unique=True)
     password = db.StringField(required=True)
-    riglists = db.ListField(db.ReferenceField(RigList))
+    riglists = db.ListField(db.ReferenceField('RigList'))
 
     def __str__(self):
         return "Username: " + self.username + "\nEmail: " + self.email + "\nPassword: " + self.password

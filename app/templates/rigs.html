@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ user.username }}'s Rigs</h1>
+{% for item in rigs %}
+<h3>{{ item.name }}</h3>
+<ul>
+{% for product in item.products %}
+<li>{{ product.name }}</li>
+{% endfor %}
+</ul>
+{% endfor %}
+{% endblock %}
