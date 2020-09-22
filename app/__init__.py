@@ -1,20 +1,19 @@
 from flask import Flask
 from flask_cors import CORS
-from database.db import initialize_db
+from database.db import initialize_db, migrate_db
 from flask_login import LoginManager
 from config import Config
+import settings
 
 app = Flask(__name__)
 CORS(app)
 login = LoginManager(app)
 
 app.config.from_object(Config)
-app.config['MONGODB_SETTINGS'] = {
-    'db': 'price-tracker',
-    'host': 'mongodb://localhost/price-tracker'
-}
+# app.config.from_object(os.environ['APP_SETTINGS'])
 
-initialize_db(app)
+db = initialize_db(app)
+migrate = migrate_db(app, db)
 
 from app import routes
 

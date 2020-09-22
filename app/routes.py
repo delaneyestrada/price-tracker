@@ -1,4 +1,4 @@
-from app import app
+from app import app, db
 from flask import Flask, request, Response, render_template, flash, redirect, url_for, session
 from database.models import Product, User, RigList
 from mongoengine.queryset.visitor import Q
@@ -57,7 +57,8 @@ def register():
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
-        user.save()
+        db.session.add(user)
+        db.session.commit()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
@@ -68,9 +69,9 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        try:
-            user = User.objects.get(username=form.username.data)
-        except DoesNotExist:
+    
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None:
             flash('Invalid username or password')
             return redirect(url_for('login'))
         
@@ -79,6 +80,7 @@ def login():
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('index'))
+        
     return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')

@@ -21,15 +21,19 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_username(self, username):
-        try:
-            user = User.objects.get(username=username.data)
+        
+        user = User.query.filter_by(username=username.data).first()
+        print(user)
+        if(user is not None):
             raise ValidationError('Username not available.')
-        except DoesNotExist:
+        else:
             return True
 
     def validate_email(self, email):
-        try:
-            user = User.objects.get(email=email.data)
+
+        user = User.query.filter_by(email=email.data).first()
+        print(user)
+        if(user is not None):
             raise ValidationError('Email address not available.')
-        except DoesNotExist:
+        else:
             return True
