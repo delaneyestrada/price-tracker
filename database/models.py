@@ -7,20 +7,32 @@ riglist_products = db.Table('riglist_products',
     db.Column('riglist_id', db.Integer, db.ForeignKey('riglists.id'), primary_key=True),
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True)
 )
+match_products = db.Table('match_products',
+    db.Column('match_id', db.Integer, db.ForeignKey('matches.id'), primary_key=True),
+    db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True)
+)
+
+class Match(db.Model):
+    __tablename__ = 'matches'
+    id = db.Column(db.Integer, primary_key=True)
+    master_string = db.Column(db.String(200))
+    products = db.relationship('Product', secondary=match_products, backref=db.backref("matches"))
+
 class Product(db.Model):
     __tablename__ = 'products'
+    __table_args__ = (db.UniqueConstraint('name', 'retailer', name='_name_retailer_uc'),)
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), index=True, unique=True)
+    name = db.Column(db.String(200), index=True)
     instrument = db.Column(db.String(64), index=True)
-    image_url = db.Column(db.String(120))
-    url = db.Column(db.String(120), unique=True)
+    image_url = db.Column(db.String(400))
+    url = db.Column(db.String(400), unique=True)
     price = db.Column(db.String(64), nullable=False)
-    # stores_available = db.StringField()
+    retailer = db.Column(db.String(64))
 
 class RigList(db.Model):
     __tablename__ = 'riglists'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True)
+    name = db.Column(db.String(120), index=True)
     products = db.relationship('Product', secondary=riglist_products, lazy='select', backref=db.backref("riglists", lazy=True))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
