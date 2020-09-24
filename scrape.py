@@ -1,65 +1,48 @@
-import requests
-from bs4 import BeautifulSoup
-import re
-from database.models import Product
+from time import sleep, time
+from scrapers.gc import get_multipage_guitar_center_products
+from scrapers.zzounds import get_multipage_zzounds_products
 
-def get_zzounds_products(path, instrument):
-    result = requests.get(path, timeout=15)
-    src = result.content
-    soup = BeautifulSoup(src, 'html5lib')
+def scrape_gc():
+    gc_url_info = {
+        'drum':                 {'num': "18210", 'name': "Drums-Percussion"}, 
+        'guitar':               {'num': "18144", 'name': "Guitars"}, 
+        'bass':                 {'num': "18171", 'name': "Bass"}, 
+        "keyboard_and_midi":    {'num': "18185", 'name': "Keyboards-MIDI"}, 
+        "recording":            {'num': "19630", 'name': "Recording-Gear"}, 
+        "live_sound":           {'num': "19615", 'name': "Live-Sound"}, 
+        "DJ":                   {'num': "19660", 'name': "DJ-Gear"}, 
+        "mics_and_wireless":    {'num': "19725", 'name': "Microphones-Wireless-Systems"}, 
+        "amps_and_effects":     {'num': "18353", 'name': "Amplifiers-Effects"}
+    }
+    print('Scraping Guitar Center...')
 
-    product_objects = soup.find_all("div", class_="product-card")
+    for key in gc_url_info.keys():
+        get_multipage_guitar_center_products(gc_url_info[key], key)
 
-    products = []
-    for product in product_objects:
-        link = product.find("a", class_="prod-name")
-        text = link.text
-        href = link['href']
-        img_url = product.find("img", class_="product-img")['src']
-        if (product.find("div", class_="price-1")):
-            price = product.find("div", class_="price-1").find("span", class_="price").text
-        else: 
-            continue
-        regex = r'\S+'
-        filtered_price = re.search(regex, price).group(0)
-        curr_product = {"name": text, "instrument": instrument, "url": href, "image_url": img_url, "price": filtered_price}
-        products.append(curr_product)
-        try:
-            result = requests.post("http://127.0.0.1:5000/products", json=curr_product)
-        except Exception as e:
-            try:
-                product_id = Product.objects(name=text).first().id
-                print(product_id)
-                result = requests.put("http://127.0.0.1:5000/products/" + str(product_id), json=curr_product)
-            except requests.exceptions.RequestException as e:
-                raise SystemExit(e)
-        except requests.exceptions.RequestException as e:
-            raise SystemExit(e)
-    return products
+def scrape_zzounds():
+    category_nums = {'drum': "2463", 'guitar': "2543", 'bass': "2392", "keyboard_and_midi": "2666", "recording": "2781", "live_sound": "2713", "DJ": "2447"}
+    print('Scraping ZZounds...')
+    
 
+    for key in category_nums.keys():
+        get_multipage_zzounds_products(category_nums[key], key)
 
-def get_multipage_zzounds_products(category, instrument):
-    url = "https://www.zzounds.com/prodsearch?cat=" + category + "&condition%5B0%5D=New&ob=az&pa=33&form=search&key=cat"
+    
 
-    result = requests.get(url)
-    src = result.content
-    soup = BeautifulSoup(src, 'html5lib')
+def run_scrapers(scrapers):
+    start_time = time()
+    
+    if(scrapers == 'all'):
+        scrape_gc()
+        scrape_zzounds()
+    elif(scrapers == "gc"):
+        scrape_gc()
+    elif(scrapers == "zzounds"):
+        scrape_zzounds()
+    else: 
+        print('incorrect scraper option')
 
-    page_buttons = soup.find("div", class_="pag-control").find_all("a")
-    num_pages = int(page_buttons[-1].text)
+    end_time = time()
+    elapsed_time = end_time - start_time
 
-    products = []
-
-    for i in range(num_pages):
-        print(i)
-        if (i != 0):
-            url = "https://www.zzounds.com/prodsearch?cat=" + category + "&condition%5B0%5D=New&ob=az&pa=33&form=search&key=cat" + "&p=" + str(i + 1)
-        
-        products += get_zzounds_products(url, instrument)
-
-    return True
-
-category_nums = {'drum': "2463", 'guitar': "2543", 'bass': "2392", "keyboard_and_midi": "2666", "recording": "2781", "live_sound": "2713", "DJ": "2447"}
-
-for key in category_nums.keys():
-    get_multipage_zzounds_products(category_nums[key], key)
+    print(f"Elapsed run time: {elapsed_time} seconds")

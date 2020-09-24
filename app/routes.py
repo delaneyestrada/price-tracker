@@ -1,4 +1,6 @@
 from app import app, db
+from scrape import run_scrapers
+from compare import compare, compare_concurrent
 from flask import Flask, request, Response, render_template, flash, redirect, url_for, session
 from database.models import Product, User, RigList
 from mongoengine.queryset.visitor import Q
@@ -6,7 +8,7 @@ from app.forms import LoginForm, RegistrationForm
 from mongoengine.errors import NotUniqueError
 from mongoengine import DoesNotExist
 from flask_login import logout_user, current_user, login_user
-import json
+import json, sys
 from math import ceil
 
 
@@ -161,12 +163,20 @@ def get_product_from_id():
 @app.route('/products', methods=['POST'])
 def add_product():
     body = request.get_json()
-    print(body)
-    try:
-        product = Product(**body).save()
-    except NotUniqueError as e:
-        raise Exception(e)
+    product = Product.query.filter_by(url=body['url']).first()
+    if product is None:
+        print('adding new product...')
+        product = Product(**body)
+        db.session.add(product)
+    else:
+        print('updating product...') 
+        for key, value in body.items():
+            setattr(product, key, value)
+
+    db.session.commit()
     
+    
+
     id = product.id
     return {'id': str(id)}, 200
 
@@ -180,3 +190,13 @@ def update_product(id):
 def delete_product(id):
     Product.objects.get(id=id).delete()
     return '', 200
+
+@app.route('/scrape/<store>', methods=['GET'])
+def scrape(store):
+    run_scrapers(store)
+    return render_template('index.html')
+
+@app.route('/fuzzy', methods=['GET'])
+def fuzzy():
+    compare_concurrent()
+    return render_template('index.html')
